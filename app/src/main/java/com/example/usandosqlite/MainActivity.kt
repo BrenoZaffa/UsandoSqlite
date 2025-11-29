@@ -10,12 +10,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.usandosqlite.database.DatabaseHandler
 import com.example.usandosqlite.databinding.ActivityMainBinding
+import com.example.usandosqlite.entity.Cadastro
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var banco: SQLiteDatabase
+    private lateinit var banco: DatabaseHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,13 +26,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        banco = openOrCreateDatabase(
-            "bdfile.sqlite",
-            MODE_PRIVATE,
-            null
-        )
-
-        banco.execSQL("CREATE TABLE IF NOT EXISTS cadastro (_id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT, telefone TEXT)")
+        banco = DatabaseHandler.getInstance(this)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -49,11 +45,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val registro = ContentValues()
-        registro.put("nome", binding.etNome.text.toString())
-        registro.put("telefone", binding.etTelefone.text.toString())
+        val cadastro = Cadastro(
+            0,
+            binding.etNome.text.toString(),
+            binding.etTelefone.text.toString()
+        )
 
-        banco.insert("cadastro", null, registro)
+        banco.inserir(cadastro)
 
         Toast.makeText(
             this,
@@ -71,11 +69,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val registro = ContentValues()
-        registro.put("nome", binding.etNome.text.toString())
-        registro.put("telefone", binding.etTelefone.text.toString())
+        val cadastro = Cadastro(
+            binding.etCod.text.toString().toInt(),
+            binding.etNome.text.toString(),
+            binding.etTelefone.text.toString()
+        )
 
-        banco.update("cadastro", registro, "_id = ?", arrayOf(binding.etCod.text.toString()))
+        banco.alterar(cadastro)
 
         Toast.makeText(
             this,
@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        banco.delete("cadastro", "_id = ?", arrayOf(binding.etCod.text.toString()))
+        banco.excluir(binding.etCod.text.toString().toInt())
 
         Toast.makeText(
             this,
@@ -111,23 +111,15 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val cursor = banco.query(
-            "cadastro",
-            null,
-            "_id = ?",
-            arrayOf(binding.etCod.text.toString()),
-            null,
-            null,
-            null
-        )
+        val cadastro = banco.pesquisar(binding.etCod.text.toString().toInt())
 
-        if(cursor.moveToNext()) {
-            var nome = cursor.getString(1)
-            var telefone = cursor.getString(2)
-
-            binding.etNome.setText(nome)
-            binding.etTelefone.setText(telefone)
+        if(cadastro != null) {
+            binding.etNome.setText(cadastro.nome)
+            binding.etTelefone.setText(cadastro.telefone)
         } else {
+            binding.etNome.text.clear()
+            binding.etTelefone.text.clear()
+
             Toast.makeText(
                 this,
                 "Registro não encontrado!",
@@ -136,20 +128,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
     fun btListarOnClick(view: View) {
-        val registros = banco.query(
-            "cadastro",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        )
+        val registros = banco.listar()
 
         val saida = StringBuilder()
 
         while(registros.moveToNext()) {
-            var cod = registros.getInt(0)
             var nome = registros.getString(1)
             var telefone = registros.getString(2)
 

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.usandosqlite.entity.Cadastro
 
-class DatabaseHandler(context: Context) : SQLiteOpenHelper(context, TABLE_NAME, null, DATABASE_VERSION) {
+class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object{
         const val DATABASE_NAME = "bdfile.sqlite"
@@ -16,6 +16,16 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(context, TABLE_NAME, 
         const val COLUMN_ID = "0"
         const val COLUMN_NOME = "1"
         const val COLUMN_TELEFONE = "2"
+
+        @Volatile
+        private var INSTANCE: DatabaseHandler? = null
+
+        fun getInstance(context: Context): DatabaseHandler {
+            if(INSTANCE == null) {
+                INSTANCE = DatabaseHandler(context)
+            }
+            return INSTANCE as DatabaseHandler
+        }
     }
 
     override fun onCreate(banco: SQLiteDatabase?) {
@@ -48,12 +58,12 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(context, TABLE_NAME, 
     }
 
     fun excluir(id: Int) {
-        writableDatabase.delete("cadastro", "_id = ?", arrayOf(id.toString()))
+        writableDatabase.delete(TABLE_NAME, "_id = ?", arrayOf(id.toString()))
     }
 
     fun pesquisar(id: Int): Cadastro? {
         val cursor = writableDatabase.query(
-            "cadastro",
+            TABLE_NAME,
             null,
             "_id = ?",
             arrayOf(id.toString()),
@@ -76,7 +86,7 @@ class DatabaseHandler(context: Context) : SQLiteOpenHelper(context, TABLE_NAME, 
 
     fun listar(): Cursor {
         val registros = writableDatabase.query(
-            "cadastro",
+            TABLE_NAME,
             null,
             null,
             null,
