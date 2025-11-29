@@ -1,6 +1,7 @@
 package com.example.usandosqlite
 
 import android.content.ContentValues
+import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteDatabase.openOrCreateDatabase
 import android.os.Bundle
@@ -11,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.usandosqlite.database.DatabaseHandler
+import com.example.usandosqlite.database.DatabaseHandler.Companion.COLUMN_NOME
+import com.example.usandosqlite.database.DatabaseHandler.Companion.COLUMN_TELEFONE
 import com.example.usandosqlite.databinding.ActivityMainBinding
 import com.example.usandosqlite.entity.Cadastro
 
@@ -128,13 +131,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
     fun btListarOnClick(view: View) {
-        val registros = banco.listar()
+        val intent = Intent(this, ListarActivity::class.java)
+        startActivity(intent)
+
+        /*val registros = banco.listar()
 
         val saida = StringBuilder()
 
         while(registros.moveToNext()) {
-            var nome = registros.getString(1)
-            var telefone = registros.getString(2)
+            var nome = registros.getString(COLUMN_NOME.toInt())
+            var telefone = registros.getString(COLUMN_TELEFONE.toInt())
 
             saida.append("Nome: $nome " + "Telefone: $telefone\n\n")
         }
@@ -143,7 +149,7 @@ class MainActivity : AppCompatActivity() {
             this,
             saida.toString(),
             Toast.LENGTH_SHORT
-        ).show()
+        ).show()*/
     }
     fun btLimparOnClick(view: View) {
         binding.etCod.text.clear()

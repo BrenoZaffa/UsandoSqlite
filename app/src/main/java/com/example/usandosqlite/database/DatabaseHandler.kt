@@ -75,8 +75,8 @@ class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(c
         var retorno: Cadastro? = null
 
         if(cursor.moveToNext()) {
-            var nome = cursor.getString(1)
-            var telefone = cursor.getString(2)
+            var nome = cursor.getString(COLUMN_NOME.toInt())
+            var telefone = cursor.getString(COLUMN_TELEFONE.toInt())
 
             retorno = Cadastro(id, nome, telefone)
         }
