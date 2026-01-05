@@ -46,7 +46,8 @@ class MainActivity : AppCompatActivity() {
             binding.etNome.setText(intent.getStringExtra("nome"))
             binding.etTelefone.setText(intent.getStringExtra("telefone"))
         } else {
-
+            binding.btExcluir.visibility = View.GONE
+            binding.btPesquisar.visibility = View.GONE
         }
     }
 
@@ -78,6 +79,8 @@ class MainActivity : AppCompatActivity() {
             msg,
             Toast.LENGTH_SHORT
         ).show()
+
+        finish()
     }
     fun btExcluirOnClick(view: View) {
         if (binding.etCod.text.isEmpty()) {
@@ -96,6 +99,8 @@ class MainActivity : AppCompatActivity() {
             "Registro excluído com sucesso!",
             Toast.LENGTH_SHORT
         ).show()
+
+        finish()
     }
     fun btPesquisarOnClick(view: View) {
         if (binding.etCod.text.isEmpty()) {
