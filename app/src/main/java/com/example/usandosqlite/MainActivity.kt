@@ -36,6 +36,18 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        initView()
+    }
+
+    private fun initView() {
+        if (intent.getIntExtra("cod", 0) != 0) {
+            binding.etCod.setText(intent.getIntExtra("cod", 0).toString())
+            binding.etNome.setText(intent.getStringExtra("nome"))
+            binding.etTelefone.setText(intent.getStringExtra("telefone"))
+        } else {
+
+        }
     }
 
     fun btIncluirOnClick(view: View) {
@@ -62,7 +74,7 @@ class MainActivity : AppCompatActivity() {
             Toast.LENGTH_SHORT
         ).show()
     }
-    fun btAlterarOnClick(view: View) {
+    fun btSalvarOnClick(view: View) {
         if (binding.etCod.text.isEmpty() || binding.etNome.text.isEmpty() || binding.etTelefone.text.isEmpty()) {
             Toast.makeText(
                 this,
@@ -150,10 +162,5 @@ class MainActivity : AppCompatActivity() {
             saida.toString(),
             Toast.LENGTH_SHORT
         ).show()*/
-    }
-    fun btLimparOnClick(view: View) {
-        binding.etCod.text.clear()
-        binding.etNome.text.clear()
-        binding.etTelefone.text.clear()
     }
 }

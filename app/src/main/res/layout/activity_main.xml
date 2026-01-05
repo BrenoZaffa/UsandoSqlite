@@ -15,6 +15,7 @@
 
     <EditText
         android:id="@+id/etCod"
+        android:enabled="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="number" />
@@ -44,20 +45,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Limpar"
-        android:onClick="btLimparOnClick" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Incluir"
-        android:onClick="btIncluirOnClick" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Alterar"
-        android:onClick="btAlterarOnClick" />
+        android:text="Salvar"
+        android:onClick="btSalvarOnClick" />
 
     <Button
         android:layout_width="wrap_content"
@@ -70,11 +59,5 @@
         android:layout_height="wrap_content"
         android:text="Pesquisar"
         android:onClick="btPesquisarOnClick" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Listar"
-        android:onClick="btListarOnClick" />
 
 </LinearLayout>
