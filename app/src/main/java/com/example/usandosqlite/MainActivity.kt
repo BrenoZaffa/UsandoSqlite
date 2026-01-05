@@ -50,51 +50,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun btIncluirOnClick(view: View) {
-        if (binding.etNome.text.isEmpty() || binding.etTelefone.text.isEmpty()) {
-            Toast.makeText(
-                this,
-                "Preencha todos os campos!",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-
-        val cadastro = Cadastro(
-            0,
-            binding.etNome.text.toString(),
-            binding.etTelefone.text.toString()
-        )
-
-        banco.inserir(cadastro)
-
-        Toast.makeText(
-            this,
-            "Registro inserido com sucesso!",
-            Toast.LENGTH_SHORT
-        ).show()
-    }
     fun btSalvarOnClick(view: View) {
-        if (binding.etCod.text.isEmpty() || binding.etNome.text.isEmpty() || binding.etTelefone.text.isEmpty()) {
-            Toast.makeText(
-                this,
-                "Preencha todos os campos!",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
+        var msg = ""
+        if(binding.etCod.text.isEmpty()) {
+            val cadastro = Cadastro(
+                0,
+                binding.etNome.text.toString(),
+                binding.etTelefone.text.toString()
+            )
+            msg = "Registro inserido com sucesso!"
+
+
+            banco.inserir(cadastro)
+        } else {
+            val cadastro = Cadastro(
+                binding.etCod.text.toString().toInt(),
+                binding.etNome.text.toString(),
+                binding.etTelefone.text.toString()
+            )
+            msg = "Registro alterado com sucesso!"
+
+            banco.alterar(cadastro)
         }
-
-        val cadastro = Cadastro(
-            binding.etCod.text.toString().toInt(),
-            binding.etNome.text.toString(),
-            binding.etTelefone.text.toString()
-        )
-
-        banco.alterar(cadastro)
 
         Toast.makeText(
             this,
-            "Registro alterado com sucesso!",
+            msg,
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -141,26 +122,5 @@ class MainActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
-    }
-    fun btListarOnClick(view: View) {
-        val intent = Intent(this, ListarActivity::class.java)
-        startActivity(intent)
-
-        /*val registros = banco.listar()
-
-        val saida = StringBuilder()
-
-        while(registros.moveToNext()) {
-            var nome = registros.getString(COLUMN_NOME.toInt())
-            var telefone = registros.getString(COLUMN_TELEFONE.toInt())
-
-            saida.append("Nome: $nome " + "Telefone: $telefone\n\n")
-        }
-
-        Toast.makeText(
-            this,
-            saida.toString(),
-            Toast.LENGTH_SHORT
-        ).show()*/
     }
 }
