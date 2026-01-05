@@ -1,11 +1,13 @@
 package com.example.usandosqlite
 
+import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteDatabase.openOrCreateDatabase
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -103,29 +105,34 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
     fun btPesquisarOnClick(view: View) {
-        if (binding.etCod.text.isEmpty()) {
-            Toast.makeText(
-                this,
-                "Preencha o código!",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
+        val etCodPesquisar = EditText(this)
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Digite o Código")
+        builder.setView(etCodPesquisar)
+        builder.setCancelable(false)
+        builder.setNegativeButton("Fechar", null)
+        builder.setPositiveButton(
+            "Pesquisar"
+        ) { dialog, which ->
+            val cadastro = banco.pesquisar(etCodPesquisar.text.toString().toInt())
+
+            if(cadastro != null) {
+                binding.etCod.setText(cadastro._id)
+                binding.etNome.setText(cadastro.nome)
+                binding.etTelefone.setText(cadastro.telefone)
+            } else {
+                binding.etCod.text.clear()
+                binding.etNome.text.clear()
+                binding.etTelefone.text.clear()
+
+                Toast.makeText(
+                    this,
+                    "Registro não encontrado!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
-
-        val cadastro = banco.pesquisar(binding.etCod.text.toString().toInt())
-
-        if(cadastro != null) {
-            binding.etNome.setText(cadastro.nome)
-            binding.etTelefone.setText(cadastro.telefone)
-        } else {
-            binding.etNome.text.clear()
-            binding.etTelefone.text.clear()
-
-            Toast.makeText(
-                this,
-                "Registro não encontrado!",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        builder.show()
     }
 }
