@@ -9,9 +9,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.usandosqlite.adapter.MeuAdapter
 import com.example.usandosqlite.database.DatabaseHandler
 import com.example.usandosqlite.databinding.ActivityListarBinding
+import kotlinx.coroutines.launch
 
 class ListarActivity : AppCompatActivity() {
 
@@ -26,7 +28,7 @@ class ListarActivity : AppCompatActivity() {
         binding = ActivityListarBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        banco = DatabaseHandler.getInstance(this)
+        banco = DatabaseHandler.getInstance()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.lvRegistros)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -41,14 +43,16 @@ class ListarActivity : AppCompatActivity() {
     }
 
     private fun initList() {
-        val cursor = banco.listar()
+        lifecycleScope.launch {
+            val lista = banco.listar()
 
-        val adapter = MeuAdapter(
-            this,
-            cursor
-        )
+            val adapter = MeuAdapter(
+                this@ListarActivity,
+                lista
+            )
 
-        binding.lvRegistros.adapter = adapter
+            binding.lvRegistros.adapter = adapter
+        }
     }
 
     fun fabIncluirOnClick(view: View) {

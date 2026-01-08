@@ -1,100 +1,59 @@
 package com.example.usandosqlite.database
 
-import android.content.ContentValues
-import android.content.Context
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
 import com.example.usandosqlite.entity.Cadastro
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObjects
+import kotlinx.coroutines.tasks.await
 
-class DatabaseHandler private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class DatabaseHandler () {
+
+    private val firestore = Firebase.firestore
 
     companion object{
-        const val DATABASE_NAME = "bdfile.sqlite"
-        const val DATABASE_VERSION = 1
-        const val TABLE_NAME = "cadastro"
-        const val COLUMN_ID = "0"
-        const val COLUMN_NOME = "1"
-        const val COLUMN_TELEFONE = "2"
+        private const val COLLECTION_NAME = "cadastro"
 
         @Volatile
         private var INSTANCE: DatabaseHandler? = null
 
-        fun getInstance(context: Context): DatabaseHandler {
-            if(INSTANCE == null) {
-                INSTANCE = DatabaseHandler(context)
+        fun getInstance(): DatabaseHandler {
+            return INSTANCE ?: synchronized(this) {
+                val instance = DatabaseHandler()
+                INSTANCE = instance
+                instance
             }
-            return INSTANCE as DatabaseHandler
         }
     }
 
-    override fun onCreate(banco: SQLiteDatabase?) {
-        banco?.execSQL("CREATE TABLE IF NOT EXISTS $TABLE_NAME (_id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT, telefone TEXT)")
+    suspend fun inserir(cadastro: Cadastro) {
+        firestore.collection(COLLECTION_NAME)
+            .document(cadastro._id)
+            .set(cadastro).await()
     }
 
-    override fun onUpgrade(
-        banco: SQLiteDatabase?,
-        oldVersion: Int,
-        newVersion: Int
-    ) {
-        banco?.execSQL("DROP TABLE IF EXISTS $TABLE_NAME")
-        onCreate(banco)
+    suspend fun alterar(cadastro: Cadastro) {
+        firestore.collection(COLLECTION_NAME)
+            .document(cadastro._id)
+            .set(cadastro).await()
     }
 
-    fun inserir(cadastro: Cadastro) {
-        val registro = ContentValues()
-        registro.put("nome", cadastro.nome)
-        registro.put("telefone", cadastro.telefone)
-
-        writableDatabase.insert(TABLE_NAME, null, registro)
+    suspend fun excluir(id: String) {
+        firestore.collection(COLLECTION_NAME)
+            .document(id)
+            .delete().await()
     }
 
-    fun alterar(cadastro: Cadastro) {
-        val registro = ContentValues()
-        registro.put("nome", cadastro.nome)
-        registro.put("telefone", cadastro.telefone)
+    suspend fun pesquisar(id: String): Cadastro? {
+        val document = firestore.collection(COLLECTION_NAME)
+            .document(id)
+            .get().await()
 
-        writableDatabase.update(TABLE_NAME, registro, "_id = ?", arrayOf(cadastro._id.toString()))
+        return document.toObject(Cadastro::class.java)
     }
 
-    fun excluir(id: Int) {
-        writableDatabase.delete(TABLE_NAME, "_id = ?", arrayOf(id.toString()))
-    }
-
-    fun pesquisar(id: Int): Cadastro? {
-        val cursor = writableDatabase.query(
-            TABLE_NAME,
-            null,
-            "_id = ?",
-            arrayOf(id.toString()),
-            null,
-            null,
-            null
-        )
-
-        var retorno: Cadastro? = null
-
-        if(cursor.moveToNext()) {
-            var nome = cursor.getString(COLUMN_NOME.toInt())
-            var telefone = cursor.getString(COLUMN_TELEFONE.toInt())
-
-            retorno = Cadastro(id, nome, telefone)
-        }
-
-        return retorno
-    }
-
-    fun listar(): Cursor {
-        val registros = writableDatabase.query(
-            TABLE_NAME,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        )
-
-        return registros
+    suspend fun listar(): List<Cadastro> {
+        val query = firestore.collection(COLLECTION_NAME)
+        val snapshot = query.get().await()
+        return snapshot.toObjects<Cadastro>()
     }
 }
